@@ -1,13 +1,11 @@
 package com.example.braintrainer
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.preference.PreferenceManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,10 +19,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvOpinion1: TextView
     private lateinit var tvOpinion2: TextView
     private lateinit var tvOpinion3: TextView
+    private lateinit var options: ArrayList<TextView>
 
     private var gameOver = false
 
+    private lateinit var question: String
+    private var rightAnswer = 0
+    private var rightAnswerPosition = 0
     private var countOfRightAnswers = 0
+    private var isPositive = true
+    private var min = 5
+    private var max = 30
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +45,77 @@ class MainActivity : AppCompatActivity() {
         tvOpinion1 = findViewById(R.id.tvOpinion1)
         tvOpinion2 = findViewById(R.id.tvOpinion2)
         tvOpinion3 = findViewById(R.id.tvOpinion3)
+        options = ArrayList<TextView>(4)
+        options.add(tvOpinion0)
+        options.add(tvOpinion1)
+        options.add(tvOpinion2)
+        options.add(tvOpinion3)
+        generateQuestion()
+        for (i in options.indices) {
+            if (i == rightAnswerPosition) {
+                options[i].text = rightAnswer.toString()
+            } else {
+                options[i].text = generateWrongAnswer().toString()
+            }
+        }
 
+
+        val timer: CountDownTimer = object : CountDownTimer(20000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = millisUntilFinished / 1000
+                tvTimer.text = seconds.toString()
+                if (millisUntilFinished < 10000) {
+                    tvTimer.setTextColor(resources.getColor(android.R.color.holo_red_light))
+                } else {
+                    tvTimer.setTextColor(resources.getColor(android.R.color.holo_green_light))
+                }
+            }
+
+//            val color = ArgbEvaluator().evaluate(
+//                millisUntilFinished / 1000,
+//                ContextCompat.getColor(applicationContext, android.R.color.holo_red_light),
+//                ContextCompat.getColor(applicationContext, android.R.color.holo_green_light)
+//            ) as Int
+
+            override fun onFinish() {
+                Toast.makeText(this@MainActivity, "Timer Finished", Toast.LENGTH_SHORT).show()
+                gameOver = true
+                val preferences = PreferenceManager.getDefaultSharedPreferences(
+                    applicationContext
+                )
+                val max = preferences.getInt("max", 0)
+                if (countOfRightAnswers >= max) {
+                    preferences.edit().putInt("max", countOfRightAnswers).apply()
+                }
+            }
+        }
+        timer.start()
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+    }
+
+    private fun generateQuestion() {
+        val a = (Math.random() * (max - min + 1) + min).toInt()
+        val b = (Math.random() * (max - min + 1) + min).toInt()
+        val mark = (Math.random() * 2).toInt()
+        isPositive = mark == 1
+        if (isPositive) {
+            rightAnswer = a + b
+            question =  String.format("%s + %s", a, b)
+        } else {
+            rightAnswer = a - b
+            question =  String.format("%s - %s", a, b)
+        }
+        tvQuestion.text = question
+        rightAnswerPosition = (Math.random() * 4).toInt()
+    }
+
+    private fun generateWrongAnswer(): Int {
+        var result = 0
+        do {
+            result = ((Math.random() * max * 2 + 1).toInt() - (max - min))
+        } while (result == rightAnswer)
+        return result
     }
 }
