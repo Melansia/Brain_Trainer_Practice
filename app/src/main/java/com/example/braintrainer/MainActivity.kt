@@ -1,5 +1,6 @@
 package com.example.braintrainer
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.preference.PreferenceManager
@@ -74,7 +75,6 @@ class MainActivity : AppCompatActivity() {
 //            ) as Int
 
             override fun onFinish() {
-                Toast.makeText(this@MainActivity, "Timer Finished", Toast.LENGTH_SHORT).show()
                 gameOver = true
                 val preferences = PreferenceManager.getDefaultSharedPreferences(
                     applicationContext
@@ -83,11 +83,12 @@ class MainActivity : AppCompatActivity() {
                 if (countOfRightAnswers >= max) {
                     preferences.edit().putInt("max", countOfRightAnswers).apply()
                 }
+                val intent = Intent(this@MainActivity, ScoreActivity::class.java)
+                intent.putExtra("result", countOfRightAnswers)
+                startActivity(intent)
             }
         }
         timer.start()
-
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
     }
 
