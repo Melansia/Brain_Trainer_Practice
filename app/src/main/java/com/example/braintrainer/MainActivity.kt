@@ -1,6 +1,7 @@
 package com.example.braintrainer
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.preference.PreferenceManager
@@ -8,9 +9,14 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.github.jinatonic.confetti.CommonConfetti
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var clMain: ConstraintLayout
 
     private lateinit var tvScore: TextView
     private lateinit var tvTimer: TextView
@@ -38,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        clMain = findViewById(R.id.clMain)
 
         tvScore = findViewById(R.id.tvScore)
         tvTimer = findViewById(R.id.tvTimer)
@@ -86,6 +93,8 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this@MainActivity, ScoreActivity::class.java)
                 intent.putExtra("result", countOfRightAnswers)
                 startActivity(intent)
+                Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
+                CommonConfetti.rainingConfetti(clMain, intArrayOf(Color.RED, Color.GREEN, Color.BLUE)).oneShot()
             }
         }
         timer.start()
@@ -142,13 +151,12 @@ class MainActivity : AppCompatActivity() {
             val answer = textView.text.toString().toInt()
             if (answer == rightAnswer) {
                 countOfRightAnswers++
-                Toast.makeText(this@MainActivity, "Wright!", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MainActivity, "Wright!", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@MainActivity, "Wrong!", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MainActivity, "Wrong!", Toast.LENGTH_SHORT).show()
             }
             countOfQuestion++
             playNext()
         }
-        Toast.makeText(this@MainActivity , "Game Over!", Toast.LENGTH_SHORT).show()
     }
 }
