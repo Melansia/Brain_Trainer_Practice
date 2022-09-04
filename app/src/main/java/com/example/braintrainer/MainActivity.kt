@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.github.jinatonic.confetti.CommonConfetti
 
 
@@ -74,13 +73,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // Try to implement the ArgbEvaluator
-//            val color = ArgbEvaluator().evaluate(
-//                millisUntilFinished / 1000,
-//                ContextCompat.getColor(applicationContext, android.R.color.holo_red_light),
-//                ContextCompat.getColor(applicationContext, android.R.color.holo_green_light)
-//            ) as Int
-
             override fun onFinish() {
                 gameOver = true
                 val preferences = PreferenceManager.getDefaultSharedPreferences(
@@ -94,7 +86,6 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("result", countOfRightAnswers)
                 startActivity(intent)
                 Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
-                CommonConfetti.rainingConfetti(clMain, intArrayOf(Color.RED, Color.GREEN, Color.BLUE)).oneShot()
             }
         }
         timer.start()
