@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.TextView
@@ -79,13 +80,23 @@ class MainActivity : AppCompatActivity() {
                     applicationContext
                 )
                 val max = preferences.getInt("max", 0)
-                if (countOfRightAnswers >= max) {
+                if (countOfRightAnswers > max) {
                     preferences.edit().putInt("max", countOfRightAnswers).apply()
+                    CommonConfetti.rainingConfetti(clMain, intArrayOf(Color.RED, Color.GREEN, Color.BLUE)).oneShot()
+                    val handler = Handler().postDelayed(object : Runnable {
+                        override fun run() {
+                            val intent = Intent(this@MainActivity, ScoreActivity::class.java)
+                            intent.putExtra("result", countOfRightAnswers)
+                            startActivity(intent)
+                        }
+                    }, 2000)
+                    Toast.makeText(this@MainActivity, "New Record!", Toast.LENGTH_SHORT).show()
+                } else {
+                    val intent = Intent(this@MainActivity, ScoreActivity::class.java)
+                    intent.putExtra("result", countOfRightAnswers)
+                    startActivity(intent)
+                    Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
                 }
-                val intent = Intent(this@MainActivity, ScoreActivity::class.java)
-                intent.putExtra("result", countOfRightAnswers)
-                startActivity(intent)
-                Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
             }
         }
         timer.start()

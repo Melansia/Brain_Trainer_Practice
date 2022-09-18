@@ -36,7 +36,6 @@ class ScoreActivity : AppCompatActivity() {
             val score = String.format("Your result: %s\nMax score: %s", result, max)
             tvResult.text = score
         }
-//        CommonConfetti.rainingConfetti(clRoot, intArrayOf(Color.RED, Color.GREEN, Color.BLUE)).oneShot()
     }
 
 
