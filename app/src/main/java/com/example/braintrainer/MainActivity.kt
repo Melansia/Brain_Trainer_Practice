@@ -5,12 +5,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
+import android.os.Looper
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.github.jinatonic.confetti.CommonConfetti
 
 
@@ -63,14 +65,24 @@ class MainActivity : AppCompatActivity() {
         playNext()
 
 
-        val timer: CountDownTimer = object : CountDownTimer(6000, 1000) {
+        val timer: CountDownTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = millisUntilFinished / 1000
                 tvTimer.text = seconds.toString()
-                if (millisUntilFinished < 10000) {
-                    tvTimer.setTextColor(resources.getColor(android.R.color.holo_red_light))
+                if (millisUntilFinished < 5000) {
+                    tvTimer.setTextColor(
+                        ContextCompat.getColor(
+                            applicationContext,
+                            android.R.color.holo_red_light
+                        )
+                    )
                 } else {
-                    tvTimer.setTextColor(resources.getColor(android.R.color.holo_green_light))
+                    tvTimer.setTextColor(
+                        ContextCompat.getColor(
+                            applicationContext,
+                            android.R.color.holo_green_light
+                        )
+                    )
                 }
             }
 
@@ -82,13 +94,14 @@ class MainActivity : AppCompatActivity() {
                 val max = preferences.getInt("max", 0)
                 if (countOfRightAnswers > max) {
                     preferences.edit().putInt("max", countOfRightAnswers).apply()
-                    CommonConfetti.rainingConfetti(clMain, intArrayOf(Color.RED, Color.GREEN, Color.BLUE)).oneShot()
-                    val handler = Handler().postDelayed(object : Runnable {
-                        override fun run() {
-                            val intent = Intent(this@MainActivity, ScoreActivity::class.java)
-                            intent.putExtra("result", countOfRightAnswers)
-                            startActivity(intent)
-                        }
+                    CommonConfetti.rainingConfetti(
+                        clMain,
+                        intArrayOf(Color.RED, Color.GREEN, Color.BLUE)
+                    ).oneShot()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val intent = Intent(this@MainActivity, ScoreActivity::class.java)
+                        intent.putExtra("result", countOfRightAnswers)
+                        startActivity(intent)
                     }, 2000)
                     Toast.makeText(this@MainActivity, "New Record!", Toast.LENGTH_SHORT).show()
                 } else {
@@ -103,12 +116,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getTime(millis: Long): String {
-        var seconds = millis / 1000
-        val minutes = seconds / 60
-        seconds %= 60
-        return String.format("%02d:%02d", minutes, seconds)
-    }
+//    private fun getTime(millis: Long): String {
+//        var seconds = millis / 1000
+//        val minutes = seconds / 60
+//        seconds %= 60
+//        return String.format("%02d:%02d", minutes, seconds)
+//    }
 
     private fun playNext() {
         generateQuestion()
@@ -130,17 +143,17 @@ class MainActivity : AppCompatActivity() {
         isPositive = mark == 1
         if (isPositive) {
             rightAnswer = a + b
-            question =  String.format("%s + %s", a, b)
+            question = String.format("%s + %s", a, b)
         } else {
             rightAnswer = a - b
-            question =  String.format("%s - %s", a, b)
+            question = String.format("%s - %s", a, b)
         }
         tvQuestion.text = question
         rightAnswerPosition = (Math.random() * 4).toInt()
     }
 
     private fun generateWrongAnswer(): Int {
-        var result = 0
+        var result: Int
         do {
             result = ((Math.random() * max * 2 + 1).toInt() - (max - min))
         } while (result == rightAnswer)
